@@ -1,0 +1,127 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.github.ben-manes:gradle-versions-plugin:0.12.0")
+        classpath("org.ajoberstar:grgit:1.7.0")
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.+')
+
+    }
+}
+
+plugins {
+    id 'com.github.jk1.dependency-license-report' version '0.3.4'
+    id 'com.github.hierynomus.license' version '0.13.1'
+    id 'org.owasp.dependencycheck' version '5.3.0'
+}
+
+def groupName = 'com.ibm.cusp'
+def projectVersion = 'SNAPSHOT'
+
+// Add snapshot version labeling
+ext {
+    if (project.hasProperty("releaseVersion")) {
+        projectVersion = releaseVersion
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'com.github.hierynomus.license'
+
+group = groupName
+version = project.version
+
+// Licensing
+license {
+    ext.copyright_year = Calendar.getInstance().get(Calendar.YEAR)
+    header = rootProject.file('COPYRIGHT-HEADER')
+    exclude("*.properties")
+    exclude("*.json")
+    exclude("*.xml")
+    exclude("*.txt")
+    exclude("*.crt")
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jgrapht:jgrapht-core:1.3.0"
+    implementation "org.jgrapht:jgrapht-ext:1.3.0"
+    implementation "com.linkedin.parseq:parseq:3.0.0"
+    implementation 'net.jodah:typetools:0.6.1'
+    implementation 'com.google.guava:guava:27.0.1-jre'
+
+    testRuntime 'org.apache.logging.log4j:log4j-api:2.11.1'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
+    testRuntime 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.assertj:assertj-core:2.1.0"
+    testCompile 'org.mockito:mockito-core:1.10.19'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Specification-Version': specificationVersion,
+                'Built-By': System.getProperty('user.name'),
+                'Built-JDK': System.getProperty('java.version')
+        )
+    }
+}
+
+// Java version definitions
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+// Set up the subproject version
+project.version = projectVersion
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId project.group
+            artifactId project.name
+            version project.version
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+dependencyCheck {
+    format = 'ALL'
+    failOnError = false
+}

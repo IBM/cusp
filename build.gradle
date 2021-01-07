@@ -62,7 +62,6 @@ dependencies {
 jar {
     manifest {
         attributes(
-                'Specification-Version': specificationVersion,
                 'Built-By': System.getProperty('user.name'),
                 'Built-JDK': System.getProperty('java.version')
         )

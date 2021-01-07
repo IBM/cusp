@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 
-# decrypt GPG signing private key
+echo Decrypting GPG signing private key
 openssl aes-256-cbc -K $encrypted_25a884814f46_key -iv $encrypted_25a884814f46_iv -in deployment/signingkey.asc.enc -out deployment/signingkey.asc -d
 
-# import secret without adding it to the trust database
-gpg --fast-import deployment/signingkey.asc
-
-# create pubring
+echo Creating pubring
 gpg --keyring=$TRAVIS_BUILD_DIR/deployment/pubring.gpg --no-default-keyring --import deployment/signingkey.asc
 
-# create secring
+echo Creating secring
 gpg --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/deployment/secring.gpg --no-default-keyring --import deployment/signingkey.asc

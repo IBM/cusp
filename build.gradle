@@ -93,7 +93,7 @@ artifacts {
 }
 
 def ossrhUsername = System.getenv('SONATYPE_USERNAME')
-def ossrhUsername = System.getenv('SONATYPE_PASSWORD')
+def ossrhPassword = System.getenv('SONATYPE_PASSWORD')
 
 uploadArchives {
     repositories {

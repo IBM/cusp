@@ -7,7 +7,7 @@ openssl aes-256-cbc -K $encrypted_25a884814f46_key -iv $encrypted_25a884814f46_i
 gpg --fast-import deployment/signingkey.asc
 
 # create pubring
-gpg --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import deployment/signingkey.asc
+gpg --keyring=$TRAVIS_BUILD_DIR/deployment/pubring.gpg --no-default-keyring --import deployment/signingkey.asc
 
 # create secring
-gpg --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring --import deployment/signingkey.asc
+gpg --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/deployment/secring.gpg --no-default-keyring --import deployment/signingkey.asc

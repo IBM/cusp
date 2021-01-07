@@ -8,3 +8,5 @@ gpg --status-fd 2 --keyring=deployment/pubring.gpg --no-default-keyring --import
 
 echo Creating secring
 gpg --status-fd 2 --allow-secret-key-import --keyring=deployment/secring.gpg --no-default-keyring --import deployment/signingkey.asc
+
+exit 0

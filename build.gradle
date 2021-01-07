@@ -20,6 +20,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 apply plugin: 'com.github.hierynomus.license'
 
@@ -69,7 +70,7 @@ jar {
 }
 
 // Java version definitions
-compilearchivesBaseName {
+compileJava {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 }
@@ -155,10 +156,4 @@ test {
 
 signing {
     sign configurations.archives
-}
-
-nexus {
-    sign = true
-    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 }

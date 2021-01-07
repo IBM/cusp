@@ -90,6 +90,10 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
+signing {
+    sign configurations.archives
+}
+
 def ossrhUsername = System.getenv('SONATYPE_USERNAME')
 def ossrhPassword = System.getenv('SONATYPE_PASSWORD')
 
@@ -152,8 +156,4 @@ test {
     testLogging {
         showStandardStreams = true
     }
-}
-
-signing {
-    sign configurations.archives
 }

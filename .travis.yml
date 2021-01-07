@@ -9,7 +9,7 @@ cache:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
 before_install: ./deployment/before_install.sh
-script: ./gradlew build
+script: ./gradlew build -Psigning.password=$PASSPHRASE
 after_success: ./deployment/deploy.sh
 env:
   global:

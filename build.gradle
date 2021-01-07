@@ -16,10 +16,6 @@ plugins {
     id 'io.codearte.nexus-staging' version '0.22.0'
 }
 
-group = "com.ibm.cusp"
-archivesBaseName = "cusp"
-version = "1.0.0"
-
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'jacoco'
@@ -28,8 +24,11 @@ apply plugin: 'maven'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.github.hierynomus.license'
 
+group = "com.ibm.cusp"
+archivesBaseName = "cusp"
+version = "1.0.0"
 
-// Licensing
+// copyright headers
 license {
     ext.copyright_year = Calendar.getInstance().get(Calendar.YEAR)
     header = rootProject.file('COPYRIGHT-HEADER')
@@ -72,7 +71,7 @@ jar {
 }
 
 // Java version definitions
-compileJava {
+compilearchivesBaseName {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 }

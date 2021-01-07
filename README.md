@@ -5,7 +5,7 @@ CUSP is a framework for constructing and executing pipelines. It represents a pi
 
 ## Usage
 
-### Declaring pipeline stage identtifiers
+### Declaring pipeline stage identifiers
 
 Create a new interface extending `Stages` that defines string constants; these will be unique identifiers for the stages in your pipeline. If you try to instantiate a pipeline with two stages that have the same name, CUSP will throw a `StageAlreadyExistsException`:
 ```
@@ -72,7 +72,7 @@ The outcome of a stage can also be `StageOutcomes.RECOVERABLE_FAILURE` if the st
 
 ### Concurrent Stages
 
-CUSP is able to execut any number of stages concurrently, with one caveat: only one of them can be used to supply the input for downstream stages. In other words, CUSP assumes that there is exactly one critical execution path in your application. This means that the other concurrent stages that are "leaf" stages alongside your critical execution path stage should either modify a shared object to be used by other stages (not recommended: see "God Object") or have a side effect that is not used in other stages. If you do not follow this model, an exception will be thrown that tells you where the problem is.
+CUSP is able to execute any number of stages concurrently, with one caveat: only one of them can be used to supply the input for downstream stages. In other words, CUSP assumes that there is exactly one critical execution path in your application. This means that the other concurrent stages that are "leaf" stages alongside your critical execution path stage should either modify a shared object to be used by other stages (not recommended: see "God Object") or have a side effect that is not used in other stages. If you do not follow this model, an exception will be thrown that tells you where the problem is.
 
 Defining multiple stages for concurrent execution is  accomplished by attaching multiple stages as children of one parent stage, such as :
 ```
@@ -102,7 +102,7 @@ Finally, execute:
 Result result = executor.execute();
 ```
 
-Note that `CuspExecutor#execute` is method type parametrized, so trying to assign its output to a variable of an incorrect type will compile but will fail with a `ClassCastException`. (This is a **TODO**; see _Future Development_ below.)
+Note that `CuspExecutor#execute` is method type parameterized, so trying to assign its output to a variable of an incorrect type will compile but will fail with a `ClassCastException`. (This is a **TODO**; see _Future Development_ below.)
 
 ## Error Handling
 
@@ -116,7 +116,7 @@ Note that `CuspExecutor#execute` is method type parametrized, so trying to assig
 
 #### Graph Tests
 
-The use of `JGraphT` to represent the pipeline as a directed graph allows graph theoretic analysis, such as [cycle detection](https://en.wikipedia.org/wiki/Cycle_(graph_theory)#Cycle_detection) and [centrality measures](https://en.wikipedia.org/wiki/Centrality). The former has been implemented, but the latter has not as the need has yet not arisen. The errors in this class derive from `CuspConstructionError` and should throw at compile time, as long as your codebase has a `CuspExecutor#execute` call executed in a test (or if your code calls `Cusp@#alidateGraph`; finding a way to demote `Cusp@validateGraph` to a private or protected method is a **TODO**; see _Future Development_ below).
+The use of `JGraphT` to represent the pipeline as a directed graph allows graph theoretic analysis, such as [cycle detection](https://en.wikipedia.org/wiki/Cycle_(graph_theory)#Cycle_detection) and [centrality measures](https://en.wikipedia.org/wiki/Centrality). The former has been implemented, but the latter has not as the need has yet not arisen. The errors in this class derive from `CuspConstructionError` and should throw at compile time, as long as your codebase has a `CuspExecutor#execute` call executed in a test (or if your code calls `Cusp#validateGraph`; finding a way to demote `Cusp#validateGraph` to a private or protected method is a **TODO**; see _Future Development_ below).
 
 Current graph test tests can be run using `Cusp#validateGraph`, which is called in `CuspExecutor#constructPipeline`. Current validation failures are:
 
@@ -124,7 +124,7 @@ Current graph test tests can be run using `Cusp#validateGraph`, which is called 
 * `UnreachableStageException`: You have registered a pipeline stage with CUSP that will never be executed because no execution path beginning with the initial pipeline stage could possibly reach it. Check to make sure that you are registering only the stages that you want to execute and that you have constructed your pipeline so that it can actually execute all of them.
 * `InfiniteLoopException`: You have created a loop in your pipeline such that, if your pipeline is executed, it may execute indefinitely. CUSP is not able to detect whether your internal stage logic guarantees that there will not be an infinite loop. CUSP does not allow loops in a pipeline.
 
-The usage of `JGraphT` for these tests means that these are general tests that don't have knowledge of your pipeline stage implemetation details. This means that, in contrast to other errors which CUSP can inform, errors in this class will not tell you exactly where the problem is. For example, the infinite loop error will tell you that your pipeline is defined in such a way that a CUSP-illegal possibly infinite loop has been defined, but the error message will not tell you which stages and routes create that loop.
+The usage of `JGraphT` for these tests means that these are general tests that don't have knowledge of your pipeline stage implementation details. This means that, in contrast to other errors which CUSP can inform, errors in this class will not tell you exactly where the problem is. For example, the infinite loop error will tell you that your pipeline is defined in such a way that a CUSP-illegal possibly infinite loop has been defined, but the error message will not tell you which stages and routes create that loop.
 
 ### Execution Errors
 
@@ -163,7 +163,7 @@ To generate a visualization:
 
 ### Stages
 
-The `Stage` interface is the base type for implementing a discrete unit of execution that either succeeds or fails; it is parametrized by one input and one output type. `AbstractStage` is an abstract class that implements `Stage` and uses the [`typetools`](https://github.com/jhalterman/typetools) package to save some developer boilerplate by automatically resolving generic types for a couple methods, which allows compile time checking that adjacent stages' input and output types match; that is, if you implement your stages by implementing `AbstractStage`, full type checking of stage input/output types will be done automatically at compile time, with descriptive error messages, by Cusp.
+The `Stage` interface is the base type for implementing a discrete unit of execution that either succeeds or fails; it is parameterized by one input and one output type. `AbstractStage` is an abstract class that implements `Stage` and uses the [`typetools`](https://github.com/jhalterman/typetools) package to save some developer boilerplate by automatically resolving generic types for a couple methods, which allows compile time checking that adjacent stages' input and output types match; that is, if you implement your stages by implementing `AbstractStage`, full type checking of stage input/output types will be done automatically at compile time, with descriptive error messages, by Cusp.
 
 ### Cusp
 
@@ -175,7 +175,7 @@ Cusp uses a graph representation of the pipeline it is used to construct. In pri
 
 ## Future Development
 
-### Improve type parametrization of CuspExecutor
+### Improve type parameterization of CuspExecutor
 
 See _Executing the pipeline_ above.
 

@@ -28,6 +28,20 @@ public class CuspExecutionError extends Exception implements CuspError<CuspError
         this.description = description;
     }
 
+    public CuspExecutionError(CuspErrorCode code, String description) {
+        super(code + ": " + description);
+
+        this.code = code;
+        this.description = description;
+    }
+
+    public CuspExecutionError(CuspErrorCode code, String description, Object... args) {
+        super(code + ": " + MessageFormat.format(description, args));
+
+        this.code = code;
+        this.description = description;
+    }
+
     public CuspExecutionError(Throwable t, CuspErrorCode code, String description, Object... args) {
         super(code + ": " + MessageFormat.format(description, args), t);
 

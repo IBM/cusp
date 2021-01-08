@@ -15,6 +15,8 @@
  */
 package com.ibm.cusp.graph.stages;
 
+import com.ibm.cusp.graph.observe.CuspObserver;
+
 public interface Stage<S,T> {
     /**
      * A unique identifier for this stage.
@@ -39,4 +41,9 @@ public interface Stage<S,T> {
      * @return
      */
     T execute(S input) throws Exception;
+
+
+    void registerObserver(CuspObserver observer);
+
+    void report(Object arg);
 }

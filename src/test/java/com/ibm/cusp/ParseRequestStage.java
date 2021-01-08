@@ -15,6 +15,7 @@
  */
 package com.ibm.cusp;
 
+import com.ibm.cusp.graph.observe.CuspStopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,10 @@ class ParseRequestStage extends AbstractStage<String, String> {
     }
 
     @Override
-    public String execute(String input) throws Exception {
-        logger.info("parsing query");
+    public String execute(String input) {
+        try (CuspStopwatch stopwatch = new CuspStopwatch(observer,"parse-request-execution-time")) {
+            logger.info("parsing query");
+        }
         return "parsed " + input;
     }
 }

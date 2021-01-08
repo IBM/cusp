@@ -15,19 +15,22 @@
  */
 package com.ibm.cusp.graph.stages;
 
+import com.ibm.cusp.graph.observe.CuspObserver;
 import net.jodah.typetools.TypeResolver;
-
-import java.util.Objects;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+import java.util.Observable;
 
-public abstract class AbstractStage<S,T> implements Stage<S,T> {
+
+public abstract class AbstractStage<S,T> extends Observable implements Stage<S,T> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Class<S> inputType;
     private final Class<T> outputType;
+
+    protected CuspObserver observer;
 
     @SuppressWarnings("unchecked")
     public AbstractStage() {
@@ -37,6 +40,20 @@ public abstract class AbstractStage<S,T> implements Stage<S,T> {
         this.outputType = (Class<T>) typeArguments[1];
 
         logger.debug("Stage {} maps {} to {}", getClass(), inputType.getSimpleName(), outputType.getSimpleName());
+    }
+
+    /**
+     * Register an observer to report information to during stage execution
+     * @param observer
+     */
+    public void registerObserver(CuspObserver observer) {
+        this.observer = observer;
+        this.addObserver(observer);
+    }
+
+    public void report(Object arg) {
+        this.setChanged();
+        this.notifyObservers(arg);
     }
 
     /**

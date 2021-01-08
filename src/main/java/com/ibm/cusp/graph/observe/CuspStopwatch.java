@@ -3,11 +3,10 @@ package com.ibm.cusp.graph.observe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.time.Duration;
 import java.util.Observable;
 
-public class CuspStopwatch extends Observable implements Closeable {
+public class CuspStopwatch extends Observable implements AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final long startTimeMillis;

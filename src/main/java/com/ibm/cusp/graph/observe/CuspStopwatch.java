@@ -34,10 +34,11 @@ public class CuspStopwatch extends Observable implements AutoCloseable {
 
     @Override
     public void close() {
-        duration = Duration.ofMillis(System.currentTimeMillis() - startTimeMillis);
+        long endTimeMillis = System.currentTimeMillis();
+        duration = Duration.ofMillis(endTimeMillis - startTimeMillis);
 
         if(countObservers() > 0) {
-            logger.trace("Stopped stopwatch {} at {}ns after {}ns", identifier, startTimeMillis, duration.toMillis());
+            logger.trace("Stopped stopwatch {} at {}ms after {}ms", identifier, endTimeMillis, duration.toMillis());
 
             setChanged();
 
@@ -45,7 +46,7 @@ public class CuspStopwatch extends Observable implements AutoCloseable {
             notifyObservers();
         } else {
             logger.warn("Stopwatch completed but there are no observers to report to");
-            logger.trace("Stopwatch {} stopped after {}ns", identifier, duration.toMillis());
+            logger.trace("Stopwatch {} stopped after {}ms", identifier, duration.toMillis());
         }
     }
 }

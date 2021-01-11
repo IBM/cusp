@@ -21,10 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.Observable;
 
 
-public abstract class AbstractStage<S,T> extends Observable implements Stage<S,T> {
+public abstract class AbstractStage<S,T> implements Stage<S,T> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Class<S> inputType;
@@ -48,12 +47,6 @@ public abstract class AbstractStage<S,T> extends Observable implements Stage<S,T
      */
     public void registerObserver(CuspObserver observer) {
         this.observer = observer;
-        this.addObserver(observer);
-    }
-
-    public void report(Object arg) {
-        this.setChanged();
-        this.notifyObservers(arg);
     }
 
     /**

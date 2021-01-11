@@ -28,6 +28,14 @@ public class CuspStopwatch extends Observable implements AutoCloseable {
     private final String identifier;
     private Duration duration;
 
+    /**
+     * {@code CuspStopwatch} provides a mechanism for reporting execution times (in ms) of arbitrary code blocks, meant to be
+     * used with try-with-resources.
+     *
+     * @param observer {@code CuspObserver} to notify
+     * @param stopwatchIdentifier
+     * @see com.ibm.cusp.graph.observe.CuspObserver
+     */
     public CuspStopwatch(CuspObserver observer, String stopwatchIdentifier) {
         identifier = stopwatchIdentifier;
         startTimeMillis = System.currentTimeMillis();
@@ -39,14 +47,25 @@ public class CuspStopwatch extends Observable implements AutoCloseable {
         logger.trace("Started stopwatch {} at {}ns", stopwatchIdentifier, startTimeMillis);
     }
 
+    /**
+     * Returns user-defined string identifier for indicating what is measured.
+     * @return identifier
+     */
     public String getIdentifier() {
         return identifier;
     }
 
+    /**
+     * Returns measured execution time.
+     * @return duration
+     */
     public Duration getDuration() {
         return duration;
     }
 
+    /**
+     * Stops timer and reports duration to observer, or logs a warning if no observer has been registered.
+     */
     @Override
     public void close() {
         long endTimeMillis = System.currentTimeMillis();

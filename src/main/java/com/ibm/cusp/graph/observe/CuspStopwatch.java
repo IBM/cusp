@@ -44,7 +44,7 @@ public class CuspStopwatch extends Observable implements AutoCloseable {
             addObserver(observer);
         }
 
-        logger.trace("Started stopwatch {} at {}ns", stopwatchIdentifier, startTimeMillis);
+        logger.trace("Started stopwatch {} at {}ms", stopwatchIdentifier, startTimeMillis);
     }
 
     /**

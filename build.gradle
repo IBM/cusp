@@ -3,11 +3,9 @@ buildscript {
         jcenter()
         mavenCentral()
     }
-    dependencies {
-        classpath("com.github.ben-manes:gradle-versions-plugin:0.12.0")
-        classpath("org.ajoberstar:grgit:1.7.0")
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.+')
 
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     }
 }
 
@@ -15,31 +13,22 @@ plugins {
     id 'com.github.jk1.dependency-license-report' version '0.3.4'
     id 'com.github.hierynomus.license' version '0.13.1'
     id 'org.owasp.dependencycheck' version '5.3.0'
-}
-
-def groupName = 'com.ibm.cusp'
-def projectVersion = 'SNAPSHOT'
-
-// Add snapshot version labeling
-ext {
-    if (project.hasProperty("releaseVersion")) {
-        projectVersion = releaseVersion
-    }
+    id 'io.codearte.nexus-staging' version '0.22.0'
 }
 
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
-apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.github.hierynomus.license'
 
-group = groupName
-version = project.version
+group = "com.ibm.cusp"
+archivesBaseName = "cusp"
+version = "1.0.0"
 
-// Licensing
+// copyright headers
 license {
     ext.copyright_year = Calendar.getInstance().get(Calendar.YEAR)
     header = rootProject.file('COPYRIGHT-HEADER')
@@ -74,7 +63,6 @@ dependencies {
 jar {
     manifest {
         attributes(
-                'Specification-Version': specificationVersion,
                 'Built-By': System.getProperty('user.name'),
                 'Built-JDK': System.getProperty('java.version')
         )
@@ -87,41 +75,85 @@ compileJava {
     targetCompatibility = 1.8
 }
 
-// Set up the subproject version
-project.version = projectVersion
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
 
 task javadocJar(type: Jar) {
+    classifier = 'javadoc'
     from javadoc
-    archiveClassifier = 'javadoc'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
-            groupId project.group
-            artifactId project.name
-            version project.version
+artifacts {
+    archives javadocJar, sourcesJar
+}
 
-            artifact sourcesJar
-            artifact javadocJar
+signing {
+    sign configurations.archives
+}
+
+def ossrhUsername = System.getenv('SONATYPE_USERNAME')
+def ossrhPassword = System.getenv('SONATYPE_PASSWORD')
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // Sign POM
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            // Add required metadata to POM
+            pom.project {
+                name 'cusp'
+                description 'CUSP is a Java software framework for creating execution pipelines composed of modular stages that emphasizes traceability, visualization, and understandability.'
+                url 'https://github.com/IBM/cusp'
+                inceptionYear '2019'
+
+                scm {
+                    url 'https://github.com/IBM/cusp'
+                    connection 'scm:https://github.com/IBM/cusp'
+                    developerConnection 'scm:git://github.com/IBM/cusp'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License'
+                        url 'https://github.com/IBM/cusp/blob/main/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'anastasds'
+                        name 'Anastas Stoyanovsky'
+                    }
+                    developer {
+                        id 'jaymindesai'
+                        name 'Jaymin Desai'
+                    }
+                }
+            }
         }
-    }
-}
-
-test {
-    testLogging {
-        showStandardStreams = true
     }
 }
 
 dependencyCheck {
     format = 'ALL'
     failOnError = false
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
 }

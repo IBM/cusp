@@ -23,6 +23,7 @@ package com.ibm.cusp.graph;
 
 import com.ibm.cusp.graph.conditions.Conditions;
 import com.ibm.cusp.graph.errors.*;
+import com.ibm.cusp.graph.observe.CuspObserver;
 import com.ibm.cusp.graph.routes.LabeledEdge;
 import com.ibm.cusp.graph.stages.Stage;
 import com.ibm.cusp.graph.stages.StageOutcomes;
@@ -33,10 +34,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Cusp {
@@ -45,6 +43,7 @@ public class Cusp {
     private final Map<String, Stage> stages;
     private final Graph<Stage, LabeledEdge> stageGraph;
     private CycleDetector cycleDetector;
+    private CuspObserver observer;
 
     public Cusp() {
         stages = new HashMap<>();
@@ -66,6 +65,10 @@ public class Cusp {
 
         stages.put(stage.name(), stage);
         stageGraph.addVertex(stage);
+
+        if(observer != null) {
+            stage.registerObserver(observer);
+        }
 
         logger.debug("Created stage: {}", stage.name());
         return stage;
@@ -219,6 +222,14 @@ public class Cusp {
         assert condition : t.getMessage();
         if(!condition) {
             throw t;
+        }
+    }
+
+    public void registerObserver(CuspObserver observer) {
+        this.observer = observer;
+        for (Stage stage : this.stages.values()) {
+            logger.trace("Registering observer to stage {}", stage.name());
+            stage.registerObserver(observer);
         }
     }
 }

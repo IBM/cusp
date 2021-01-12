@@ -19,35 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ibm.cusp.graph.stages;
+package com.ibm.cusp.graph.errors;
 
-import com.ibm.cusp.graph.observe.CuspObserver;
+import java.text.MessageFormat;
 
-public interface Stage<S,T> {
-    /**
-     * A unique identifier for this stage.
-     * @return
-     */
-    String name();
+import static com.ibm.cusp.graph.errors.CuspErrorCode.OBSERVATION_ERROR;
 
-    /**
-     * The input data type that this stage accepts. See {@link AbstractStage} for implementation.
-     * @return
-     */
-    Class<S> getInputType();
+public class CuspObservationException extends CuspConstructionError {
+    public CuspObservationException(String message) {
+        super(OBSERVATION_ERROR, "Observation error: {0}", message);
+    }
 
-    /**
-     * The output data type that this stage emits. See {@link AbstractStage} for implementation.
-     * @return
-     */
-    Class<T> getOutputType();
-
-    /**
-     * The implementation of this stage.
-     * @return
-     */
-    T execute(S input) throws Exception;
-
-
-    void registerObserver(CuspObserver observer);
+    public CuspObservationException(String message, Object... args) {
+        super(OBSERVATION_ERROR, "Observation error: {0}", MessageFormat.format(message, args));
+    }
 }

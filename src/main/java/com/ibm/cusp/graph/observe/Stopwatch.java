@@ -19,35 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ibm.cusp.graph.stages;
+package com.ibm.cusp.graph.observe;
 
-import com.ibm.cusp.graph.observe.CuspObserver;
-
-public interface Stage<S,T> {
-    /**
-     * A unique identifier for this stage.
-     * @return
-     */
-    String name();
-
-    /**
-     * The input data type that this stage accepts. See {@link AbstractStage} for implementation.
-     * @return
-     */
-    Class<S> getInputType();
-
-    /**
-     * The output data type that this stage emits. See {@link AbstractStage} for implementation.
-     * @return
-     */
-    Class<T> getOutputType();
-
-    /**
-     * The implementation of this stage.
-     * @return
-     */
-    T execute(S input) throws Exception;
-
-
-    void registerObserver(CuspObserver observer);
+public interface Stopwatch {
+    void start();
 }

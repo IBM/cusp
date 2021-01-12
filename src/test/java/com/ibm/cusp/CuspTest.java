@@ -25,9 +25,12 @@ import com.ibm.cusp.execution.CuspExecutor;
 import com.ibm.cusp.execution.StageOutcomeListener;
 import com.ibm.cusp.graph.Cusp;
 import com.ibm.cusp.graph.errors.*;
+import com.ibm.cusp.graph.observe.CuspObserver;
+import com.ibm.cusp.graph.observe.CuspStopwatch;
 import com.ibm.cusp.graph.stages.Stage;
 import com.ibm.cusp.graph.stages.StageOutcomes;
 import com.ibm.cusp.graph.visualize.CuspVisualizer;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.internal.matchers.GreaterOrEqual;
@@ -52,8 +55,17 @@ public class CuspTest {
     private final WidgetRequest request = new WidgetRequest();
     private final Executor taskExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ScheduledExecutorService timerScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final List<String> sink = Collections.synchronizedList(new ArrayList<>());
+
+    private List<String> sink = Collections.synchronizedList(new ArrayList<>());
     private static final int EXPECTED_LOG_SINK_SIZE = 2;
+
+    private List<String> reportedEvents;
+
+    @Before
+    public void sanitize() {
+        reportedEvents = Collections.synchronizedList(new ArrayList<>());
+        sink = Collections.synchronizedList(new ArrayList<>());
+    }
 
     @Test
     public void it_is_fine_when_everything_is_fine() throws Throwable {
@@ -71,6 +83,21 @@ public class CuspTest {
     }
 
     @Test
+    public void it_can_report_events_during_stage_execution() throws InterruptedException, UnknownExecutionError, StageFailedException {
+        Cusp cusp = createPipeline(new ParseRequestStage(), new LogRequestStage(sink), new QueryInventoryStage(), new QueryBackupSystem(), new ManufactureWidgetsStage());
+
+        CuspExecutor executor = new CuspExecutor(cusp, taskExecutor, timerScheduler);
+        executor.constructPipeline(WidgetStages.RECEIVE_REQUEST, request);
+        executor.execute();
+
+        Thread.sleep(1000);
+        assertEquals(1, reportedEvents.size());
+        assertEquals("parse-request-execution-time was recorded", reportedEvents.get(0));
+
+        logger.debug(executor.generateTrace());
+    }
+
+        @Test
     public void it_complains_when_a_stage_is_used_by_two_downstream_stages_directly() throws InterruptedException, UnknownExecutionError, StageFailedException {
         Cusp cusp = new Cusp();
         cusp.addStage(new ParseRequestStage());
@@ -453,6 +480,14 @@ public class CuspTest {
         cusp.addRoute(WidgetStages.QUERY_INVENTORY, StageOutcomes.SUCCESS, WidgetStages.PLACE_ORDER);
         cusp.addRoute(WidgetStages.QUERY_INVENTORY, StageOutcomes.RECOVERABLE_FAILURE, WidgetStages.QUERY_BACKUP_SYSTEM);
         cusp.addRoute(WidgetStages.QUERY_BACKUP_SYSTEM, StageOutcomes.RECOVERABLE_FAILURE, WidgetStages.MANUFACTURE_WIDGETS);
+
+        CuspObserver observer = new CuspObserver() {
+            @Override
+            public void receiveDuration(CuspStopwatch stopwatch) {
+                reportedEvents.add(stopwatch.getIdentifier() + " was recorded");
+            }
+        };
+        cusp.registerObserver(observer);
 
         return cusp;
     }

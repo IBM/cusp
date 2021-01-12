@@ -44,6 +44,4 @@ public interface Stage<S,T> {
 
 
     void registerObserver(CuspObserver observer);
-
-    void report(Object arg);
 }

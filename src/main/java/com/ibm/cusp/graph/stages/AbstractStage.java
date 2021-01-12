@@ -5,7 +5,7 @@
  * OCO Source Materials
  *
  * 5727-I17
- * (C) Copyright IBM Corp. 2020 All Rights Reserved.
+ * (C) Copyright IBM Corp. 2021 All Rights Reserved.
  *
  * The source code for this program is not published or otherwise
  * divested of its trade secrets, irrespective of what has been
@@ -16,11 +16,10 @@
 package com.ibm.cusp.graph.stages;
 
 import net.jodah.typetools.TypeResolver;
-
-import java.util.Objects;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 
 public abstract class AbstractStage<S,T> implements Stage<S,T> {

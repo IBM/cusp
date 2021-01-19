@@ -11,7 +11,7 @@ cache:
 before_install:
 - openssl aes-256-cbc -K $encrypted_6afd0fc9428e_key -iv $encrypted_6afd0fc9428e_iv
   -in deployment/secring.gpg.enc -out deployment/secring.gpg -d
-install: "./gradlew build -x sign -Psigning.password=$PASSPHRASE"
+install: "./gradlew build -Psigning.password=$PASSPHRASE"
 after_success: "./deployment/deploy.sh"
 env:
   global:

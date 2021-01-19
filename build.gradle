@@ -90,10 +90,6 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-signing {
-    sign configurations.archives
-}
-
 def ossrhUsername = System.getenv('SONATYPE_USERNAME')
 def ossrhPassword = System.getenv('SONATYPE_PASSWORD')
 
@@ -117,6 +113,7 @@ uploadArchives {
                 description 'CUSP is a Java software framework for creating execution pipelines composed of modular stages that emphasizes traceability, visualization, and understandability.'
                 url 'https://github.com/IBM/cusp'
                 inceptionYear '2019'
+                packaging 'jar'
 
                 scm {
                     url 'https://github.com/IBM/cusp'

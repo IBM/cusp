@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+//=======================================
+// apply build plugins
+//=======================================
+
 plugins {
     id 'com.github.jk1.dependency-license-report' version '0.3.4'
     id 'com.github.hierynomus.license' version '0.13.1'
@@ -23,24 +27,21 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'io.codearte.nexus-staging'
-
-
 apply plugin: 'com.github.hierynomus.license'
+
+
+//=======================================
+// build properties
+//=======================================
 
 group = "com.ibm.cusp"
 archivesBaseName = "cusp"
 version = "1.0.0"
 
-// copyright headers
-license {
-    ext.copyright_year = Calendar.getInstance().get(Calendar.YEAR)
-    header = rootProject.file('COPYRIGHT-HEADER')
-    exclude("*.properties")
-    exclude("*.json")
-    exclude("*.xml")
-    exclude("*.txt")
-    exclude("*.crt")
-}
+
+//=======================================
+// dependencies and dependency checks
+//=======================================
 
 repositories {
     mavenLocal()
@@ -63,6 +64,47 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.10.19'
 }
 
+dependencyCheck {
+    format = 'ALL'
+    failOnError = false
+}
+
+
+//=======================================
+// source code properties and checks
+//=======================================
+
+license {
+    ext.copyright_year = Calendar.getInstance().get(Calendar.YEAR)
+    header = rootProject.file('COPYRIGHT-HEADER')
+    exclude("*.properties")
+    exclude("*.json")
+    exclude("*.xml")
+    exclude("*.txt")
+    exclude("*.crt")
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+
+//=======================================
+// testing configuration
+//=======================================
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+
+//=======================================
+// packaging
+//=======================================
+
 jar {
     manifest {
         attributes(
@@ -71,13 +113,6 @@ jar {
         )
     }
 }
-
-// Java version definitions
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-}
-
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -92,6 +127,15 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives javadocJar, sourcesJar
 }
+
+signing {
+    sign configurations.archives
+}
+
+
+//=======================================
+// publication
+//=======================================
 
 def ossrhUsername = System.getenv('SONATYPE_USERNAME')
 def ossrhPassword = System.getenv('SONATYPE_PASSWORD')
@@ -144,16 +188,5 @@ uploadArchives {
                 }
             }
         }
-    }
-}
-
-dependencyCheck {
-    format = 'ALL'
-    failOnError = false
-}
-
-test {
-    testLogging {
-        showStandardStreams = true
     }
 }
